@@ -4,18 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"golang.org/x/net/html"
+	"htx/utils"
 	"os"
 	"strings"
 )
-
-func contains(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
-}
 
 func main() {
 	r := bufio.NewReader(os.Stdin)
@@ -37,11 +29,11 @@ func main() {
 			indentPosition += indentSize
 		}
 
-		if t.Type.String() == "StartTag" && contains(t.Data, omitTags) {
+		if t.Type.String() == "StartTag" && utils.ArrContains(t.Data, omitTags) {
 			isSkipMode = true
 		}
 
-		if t.Type.String() == "EndTag" && contains(t.Data, omitTags) {
+		if t.Type.String() == "EndTag" && utils.ArrContains(t.Data, omitTags) {
 			isSkipMode = false
 		}
 
