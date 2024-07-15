@@ -4,56 +4,25 @@ import (
 	"bufio"
 	"fmt"
 	"golang.org/x/net/html"
+	"htx/filter"
 	"os"
-	"strings"
 )
-
-func contains(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
-}
 
 func main() {
 	r := bufio.NewReader(os.Stdin)
 	z := html.NewTokenizer(r)
 
-	indentPosition := 0
-	indentSize := 1
-	isSkipMode := false
-	omitTags := []string{"script", "style"}
+	// TODO: can only read once, so it's either html.Parse or html.NewTokenizer
+	// doc, err := html.Parse(r)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// html.Render(os.Stdout, doc)
 
-	for {
-		tt := z.Next()
-		if tt == html.ErrorToken {
-			return
-		}
-		t := z.Token()
-
-		if t.Type.String() == "StartTag" {
-			indentPosition += indentSize
-		}
-
-		if t.Type.String() == "StartTag" && contains(t.Data, omitTags) {
-			isSkipMode = true
-		}
-
-		if t.Type.String() == "EndTag" && contains(t.Data, omitTags) {
-			isSkipMode = false
-		}
-
-		if t.Type.String() == "Text" && isSkipMode == false {
-			text := strings.TrimSpace(t.Data)
-			if len(text) > 0 {
-				fmt.Println(strings.Repeat(" ", indentPosition) + text)
-			}
-		}
-
-		if t.Type.String() == "EndTag" {
-			indentPosition -= indentSize
-		}
+	text, err := filter.ExtractText(z)
+	if err != nil {
+		panic(err)
 	}
+	fmt.Fprintln(os.Stdout, text)
+
 }
