@@ -19,3 +19,9 @@ cat sample.html | bin/htx
 ```sh
 wget -q -O - https://example.com/ | bin/htx
 ```
+
+Extract formatted text
+
+```sh
+bin/htx -prettytext
+```

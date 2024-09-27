@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"golang.org/x/net/html"
 	"htx/filter"
@@ -12,17 +13,25 @@ func main() {
 	r := bufio.NewReader(os.Stdin)
 	z := html.NewTokenizer(r)
 
-	// TODO: can only read once, so it's either html.Parse or html.NewTokenizer
-	// doc, err := html.Parse(r)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// html.Render(os.Stdout, doc)
+	shouldExtractText := flag.Bool("text", false, "Flag to extract text")
+	shouldExtractPrettyText := flag.Bool("prettytext", false, "Flag to extract pretty text")
 
-	text, err := filter.ExtractText(z)
-	if err != nil {
-		panic(err)
+	flag.Parse()
+
+	// default should extract text
+	if *shouldExtractText || (*shouldExtractText == false && *shouldExtractPrettyText == false) {
+		text, err := filter.ExtractText(z)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Fprintln(os.Stdout, text)
 	}
-	fmt.Fprintln(os.Stdout, text)
 
+	if *shouldExtractPrettyText {
+		text, err := filter.ExtractPrettyText(z)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Fprintln(os.Stdout, text)
+	}
 }
